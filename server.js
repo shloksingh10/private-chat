@@ -60,6 +60,16 @@ io.sockets.on('connection', function (socket) {
   socket.on('send request', function (data) {
     users[data.receive].emit('incoming request',data.send);
   });
+  //accept request
+  socket.on('accept request', function (data) {
+    console.log(data.user1);
+    console.log(data.user2);
+    users[data.user1].emit('show chat',data.user2);
+    users[data.user2].emit('show chat',data.user1);
+    io.sockets.emit('validate request',data.user2);
+    io.sockets.emit('validate request',data.user1);
+  });
+  //Accept request
   function updateUsernames() {
     io.sockets.emit('get users', Object.keys(users));
   }

@@ -11,7 +11,7 @@
   </div>
 </div>
 
-<div class="topcorner">
+<div *ngIf="showChat == false" class="topcorner">
   <div class="row">
     <div class="col-md-6">
     <table class="table table-hover" width="100">
@@ -30,21 +30,21 @@
   </div>
 </div>
 
-<div *ngIf="disp == false" >
+<div *ngIf="disp == false && showChat == false" >
   <div class="row">
     <div class="col-md-6">
-      <table class="table table-hover" width="100">
-        <thead>
-        <tr>
-          <th class="col-md-2">Requests from:</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr *ngFor="let request of requests" >
-          <td class="col-md-2">{{request}}</td>
-        </tr>
-        </tbody>
-      </table>
+      <label>Requests: </label>
+      <div *ngFor="let request of requests">
+        <div class="col-md-6">
+          {{request}}
+        </div>
+        <div class="col-md-3">
+          <div class="btn-group">
+            <button type="button" (click)="deletingRequest(request)" class="btn btn-danger">Delete</button>
+            <button type="button" (click)="acceptingRequest(request)" class="btn btn-success">Accept</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

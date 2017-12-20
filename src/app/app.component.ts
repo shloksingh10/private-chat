@@ -10,12 +10,15 @@ import * as io from 'socket.io-client';
 export class AppComponent implements OnInit {
   socket;
   username: string;
+  receiver: string;
   disp: boolean;
+  showChat: boolean;
   users: Array<any>;
   requests: Array<any> = [];
   ngOnInit(): void {
     this.socket = io();
     this.disp = true;
+    this.showChat = false;
     // Displaying Online Users
     this.socket.on('get users', (users) => {
       this.users = users;
@@ -26,22 +29,22 @@ export class AppComponent implements OnInit {
         return ;
       }
       this.requests.push(data);
-      console.log(data);
     });
 
     this.socket.on('validate request', (data) => {
       this.requests.splice(this.requests.indexOf(data), 1);
+    });
+    // Displaying chat box
+    this.socket.on('show chat', (data) => {
+      this.receiver = data;
+      this.showChat = true;
     });
   }
   // Entering username
   submitUsername(): void {
     this.socket.emit('new user', this.username.trim(),  (data) => {
       if (data) {
-        console.log('successful submission');
         this.disp = false;
-      }
-      else {
-        console.log('no submission');
       }
     });
   }
@@ -52,5 +55,17 @@ export class AppComponent implements OnInit {
       receive : receive
     };
     this.socket.emit('send request', req);
+  }
+  deletingRequest(request): void {
+    this.requests.splice(this.requests.indexOf(request), 1);
+  }
+  acceptingRequest(person2): void {
+    var req = {
+      user1: this.username,
+      user2: person2
+    };
+    console.log(req.user1);
+    console.log(req.user2);
+    this.socket.emit('accept request', req);
   }
 }
