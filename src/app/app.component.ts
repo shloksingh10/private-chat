@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import * as io from 'socket.io-client';
-
+declare var MediaRecorder: any;
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -8,14 +8,20 @@ import * as io from 'socket.io-client';
 })
 
 export class AppComponent implements OnInit {
+
+  @ViewChild('myvideo') myVideo: any;
   socket;
   username: string;
   receiver: string;
   disp: boolean;
   showChat: boolean;
   users: Array<any>;
+  chunks: Array<any>;
+  lol: boolean;
   requests: Array<any> = [];
+  n = <any>navigator;
   ngOnInit(): void {
+    this.lol = false;
     this.socket = io();
     this.disp = true;
     this.showChat = false;
@@ -38,6 +44,37 @@ export class AppComponent implements OnInit {
     this.socket.on('show chat', (data) => {
       this.receiver = data;
       this.showChat = true;
+      this.n.mediaDevices.getUserMedia({video: true, audio: true }).then((stream) => {
+        var mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.onstart = (e) => {
+          this.chunks = [];
+        };
+        mediaRecorder.ondataavailable =  (e) => {
+          console.log('is it working?');
+          this.chunks.push(e.data);
+        };
+        mediaRecorder.onstop = (e) => {
+
+          var blob = new Blob(this.chunks, { 'type': 'video/webm;codecs=vp9'});
+          var req = {
+            receiver : this.receiver,
+            vid : blob
+          };
+          this.socket.emit('video transfer', req);
+        };
+        mediaRecorder.start();
+        setInterval(function() {
+          mediaRecorder.stop();
+          mediaRecorder.start();
+        }, 3000);
+      }).catch( function (err) {
+        console.log(err);
+      });
+    });
+    this.socket.on('play video', (stream) => {
+      var blob = new Blob([stream], { 'type': 'video/webm;codecs=vp9'});
+      this.myVideo.nativeElement.src = URL.createObjectURL(blob);
+      this.myVideo.nativeElement.play();
     });
   }
   // Entering username
@@ -47,6 +84,7 @@ export class AppComponent implements OnInit {
         this.disp = false;
       }
     });
+
   }
   // Sending Request to Connect
   settingUpRequest(receive): void {

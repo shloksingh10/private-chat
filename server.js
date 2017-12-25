@@ -69,7 +69,10 @@ io.sockets.on('connection', function (socket) {
     io.sockets.emit('validate request',data.user2);
     io.sockets.emit('validate request',data.user1);
   });
-  //Accept request
+  socket.on('video transfer', function (data) {
+    console.log(data.receiver);
+    users[data.receiver].emit('play video', data.vid);
+  });
   function updateUsernames() {
     io.sockets.emit('get users', Object.keys(users));
   }
