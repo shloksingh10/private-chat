@@ -36,7 +36,7 @@ io.sockets.on('connection', function (socket) {
 
   //Send Message
   socket.on('send message', function (data) {
-    console.log(data);
+    //console.log(data);
     var pdata = socket.username+": "+data;
     io.sockets.emit('new message', {msg: pdata});
   });
@@ -48,7 +48,7 @@ io.sockets.on('connection', function (socket) {
     }
     else {
       callback(true);
-      console.log('Connected: ' + data);
+      //console.log('Connected: ' + data);
       socket.username = data;
       users[socket.username] = socket;
       updateUsernames();
@@ -62,16 +62,18 @@ io.sockets.on('connection', function (socket) {
   });
   //accept request
   socket.on('accept request', function (data) {
-    console.log(data.user1);
-    console.log(data.user2);
+    //console.log(data.user1);
+    //console.log(data.user2);
     users[data.user1].emit('show chat',data.user2);
     users[data.user2].emit('show chat',data.user1);
     io.sockets.emit('validate request',data.user2);
     io.sockets.emit('validate request',data.user1);
   });
   socket.on('video transfer', function (data) {
-    console.log(data.receiver);
-    users[data.receiver].emit('play video', data.vid);
+    //console.log(data.receiver);
+    if(data.receiver in users){
+      users[data.receiver].emit('play video', data.vid);
+    }
   });
   function updateUsernames() {
     io.sockets.emit('get users', Object.keys(users));

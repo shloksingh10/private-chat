@@ -50,7 +50,7 @@ export class AppComponent implements OnInit {
           this.chunks = [];
         };
         mediaRecorder.ondataavailable =  (e) => {
-          console.log('is it working?');
+          //console.log('is it working?');
           this.chunks.push(e.data);
         };
         mediaRecorder.onstop = (e) => {
@@ -66,7 +66,7 @@ export class AppComponent implements OnInit {
         setInterval(function() {
           mediaRecorder.stop();
           mediaRecorder.start();
-        }, 3000);
+        }, 1000);
       }).catch( function (err) {
         console.log(err);
       });
@@ -102,8 +102,8 @@ export class AppComponent implements OnInit {
       user1: this.username,
       user2: person2
     };
-    console.log(req.user1);
-    console.log(req.user2);
+    //console.log(req.user1);
+    //console.log(req.user2);
     this.socket.emit('accept request', req);
   }
 }
